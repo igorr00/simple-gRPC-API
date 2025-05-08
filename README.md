@@ -51,5 +51,6 @@ Server listens on 0.0.0.0:50051 by default.
 node client.js
 ```
 The client will:
-  1. Create a new user
-  2. Fetch and display all users
+  1. Create new users while checking if a user with the same email already exists
+  2. Delete one user
+  3. Fetch and display all users
