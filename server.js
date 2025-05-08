@@ -41,6 +41,11 @@ async function initializeDb() {
 async function createUser(call, callback) {
   const { name, email } = call.request;
   try {
+    const existing = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (existing.rows.length > 0) {
+      return callback(null, { user: existing.rows[0] });
+    }
+
     const insertQuery = 'INSERT INTO users(name, email) VALUES($1, $2) RETURNING *';
     const result = await pool.query(insertQuery, [name, email]);
     const user = result.rows[0];
@@ -49,14 +54,14 @@ async function createUser(call, callback) {
     console.error("Error creating user:", err);
     callback({
       code: grpc.status.INTERNAL,
-      message: err.message
+      message: err.message,
     });
   }
 }
 
 async function getUsers(call, callback) {
   try {
-    const selectQuery = 'SELECT * FROM users';
+    const selectQuery = 'SELECT * FROM users order by id';
     const result = await pool.query(selectQuery);
     callback(null, { users: result.rows });
   } catch (err) {
@@ -68,11 +73,26 @@ async function getUsers(call, callback) {
   }
 }
 
+async function deleteUser(call, callback) {
+  const { email } = call.request;
+  try {
+    const result = await pool.query('DELETE FROM users WHERE email = $1', [email]);
+    const success = result.rowCount > 0;
+    callback(null, { success });
+  } catch (err) {
+    console.error("Error deleting user:", err);
+    callback({
+      code: grpc.status.INTERNAL,
+      message: err.message
+    });
+  }
+}
+
 async function main() {
   await initializeDb();
 
   const server = new grpc.Server();
-  server.addService(userProto.UserService.service, { createUser, getUsers });
+  server.addService(userProto.UserService.service, { createUser, getUsers, deleteUser });
 
   const bindAddress = '0.0.0.0:50051';
   server.bindAsync(bindAddress, grpc.ServerCredentials.createInsecure(), (err, port) => {

@@ -23,7 +23,16 @@ message GetUsersResponse {
   repeated User users = 1;
 }
 
+message DeleteUserRequest {
+  string email = 1;
+}
+
+message DeleteUserResponse {
+  bool response = 1;
+}
+
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
   rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
+  rpc DeleteUser(DeleteUserRequest) returns(DeleteUserResponse);
 }
