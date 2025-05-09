@@ -43,6 +43,16 @@ function getUsers() {
   });
 }
 
+function getUsersByName(name) {
+  return new Promise((resolve, reject) => {
+    client.getUsersByName({name}, (err, response) => {
+      if (err) return reject(err);
+      console.log("Users with the name " + name + ":", response.users);
+      resolve(response.users);
+    });
+  });
+}
+
 function deleteUser(email) {
   return new Promise((resolve, reject) => {
     client.deleteUser({ email }, (err, response) => {
@@ -72,6 +82,8 @@ async function run() {
     }
 
     await getUsers();
+
+    await getUsersByName("Pera");
   } catch (err) {
     console.error("Unhandled Error:", err);
   }

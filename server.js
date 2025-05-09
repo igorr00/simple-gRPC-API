@@ -73,6 +73,21 @@ async function getUsers(call, callback) {
   }
 }
 
+async function getUsersByName(call, callback) {
+  const { name } = call.request;
+  try {
+    const selectQuery = 'SELECT * FROM users where name like $1 order by id';
+    const result = await pool.query(selectQuery, [`%${name}%`]);
+    callback(null, { users: result.rows });
+  } catch (err) {
+    console.error("Error retrieving users:", err);
+    callback({
+      code: grpc.status.INTERNAL,
+      message: err.message
+    });
+  }
+}
+
 async function deleteUser(call, callback) {
   const { email } = call.request;
   try {
@@ -92,7 +107,7 @@ async function main() {
   await initializeDb();
 
   const server = new grpc.Server();
-  server.addService(userProto.UserService.service, { createUser, getUsers, deleteUser });
+  server.addService(userProto.UserService.service, { createUser, getUsers, getUsersByName, deleteUser });
 
   const bindAddress = '0.0.0.0:50051';
   server.bindAsync(bindAddress, grpc.ServerCredentials.createInsecure(), (err, port) => {
