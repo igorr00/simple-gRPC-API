@@ -1,6 +1,6 @@
 # simple-gRPC-API
 
-This project is a simple **gRPC API built with Node.js** and backed by a **PostgreSQL** database. It provides functionality to create new users and retrieve all users.
+This project is a simple **gRPC API built with Node.js** and backed by a **PostgreSQL** database. It provides functionality to create new users, delete users, retrieve all users and retrieve them by name.
 
 ##  Technologies Used
 
@@ -54,3 +54,4 @@ The client will:
   1. Create new users while checking if a user with the same email already exists
   2. Delete one user
   3. Fetch and display all users
+  4. Fetch and display all users with the specified name
